@@ -1,4 +1,4 @@
-# EnglishWay Full Application
+# Jungle In English Full Application
 
 EnglishWay is a full-stack microservices application for English learning, with courses, users, blogs, training, games, messaging, tracking, events, and ecommerce features.
 
