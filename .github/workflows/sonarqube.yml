@@ -51,6 +51,6 @@ jobs:
         run: |
           npx --yes @sonar/scan `
             -Dsonar.projectKey=jungle-in-english `
-            -Dsonar.projectName="Jungle in English - Angular" `
+            -Dsonar.projectName=Jungle in English `
             -Dsonar.sources=src `
             -Dsonar.exclusions="**/node_modules/**,**/dist/**,**/coverage/**,**/*.spec.ts"
