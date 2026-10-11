@@ -44,13 +44,15 @@ jobs:
         run: npm run build
 
       - name: Analyze Angular with SonarQube
+        uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        working-directory: Frontend
-        run: |
-          npx --yes @sonar/scan `
-            -Dsonar.projectKey=jungle-in-english `
-            -Dsonar.projectName=Jungle in English `
-            -Dsonar.sources=src `
-            -Dsonar.exclusions="**/node_modules/**,**/dist/**,**/coverage/**,**/*.spec.ts"
+        with:
+          projectBaseDir: Frontend
+          args: >
+            -Dsonar.projectKey=jungle-in-english
+            -Dsonar.projectName=Jungle-in-English
+            -Dsonar.sources=src
+            -Dsonar.sourceEncoding=UTF-8
+            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/coverage/**,**/*.spec.ts
