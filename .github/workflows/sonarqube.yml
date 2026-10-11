@@ -101,4 +101,3 @@ jobs:
           if ($LASTEXITCODE -ne 0) {
             throw "SonarQube analysis failed."
           }
-```
