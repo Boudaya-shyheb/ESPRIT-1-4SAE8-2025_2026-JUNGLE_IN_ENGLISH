@@ -1,5 +1,4 @@
-```yaml
-name: Build and SonarQube Analysis
+name: SonarQube Analysis
 
 on:
   push:
@@ -16,7 +15,6 @@ permissions:
 
 jobs:
   build-and-analyze:
-    # Requires a self-hosted runner installed on your Windows laptop.
     runs-on: self-hosted
 
     steps:
@@ -25,31 +23,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'zulu'
-          cache: maven
-
-      - name: Check tools
+      - name: Check environment
         shell: powershell
         run: |
           java -version
           mvn -version
           node --version
           npm --version
+          sonar-scanner --version
 
-      - name: Build all Maven projects
+      - name: Build Java microservices
         shell: powershell
         run: |
           $poms = Get-ChildItem -Path . -Recurse -Filter pom.xml |
-            Where-Object {
-              $_.FullName -notmatch '[\\/](target|\.git)[\\/]'
-            }
+            Where-Object { $_.FullName -notmatch '[\\/](target|\.git)[\\/]' }
 
           if (-not $poms) {
-            throw "No pom.xml files found."
+            throw "No Maven pom.xml files found."
           }
 
           foreach ($pom in $poms) {
@@ -57,44 +47,23 @@ jobs:
             mvn -B -f "$($pom.FullName)" clean verify
 
             if ($LASTEXITCODE -ne 0) {
-              throw "Maven build failed: $($pom.FullName)"
+              throw "Build failed: $($pom.FullName)"
             }
           }
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: npm
-          cache-dependency-path: Frontend/package-lock.json
-
-      - name: Install frontend dependencies
-        shell: powershell
-        working-directory: Frontend
-        run: npm ci
-
-      - name: Build Angular frontend
-        shell: powershell
-        working-directory: Frontend
-        run: npm run build
-
       - name: Analyze repository with SonarQube
+        shell: powershell
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        shell: powershell
         run: |
-          $args = @(
-            "-Dsonar.projectKey=jungle-in-english",
-            "-Dsonar.projectName=Jungle in English",
-            "-Dsonar.sources=.",
-            "-Dsonar.sourceEncoding=UTF-8",
+          sonar-scanner `
+            "-Dsonar.projectKey=jungle-in-english" `
+            "-Dsonar.projectName=Jungle in English" `
+            "-Dsonar.sources=." `
+            "-Dsonar.sourceEncoding=UTF-8" `
             "-Dsonar.exclusions=**/.git/**,**/node_modules/**,**/target/**,**/build/**,**/dist/**,**/coverage/**,**/.angular/**,**/*.min.js,**/*.map"
-          )
-
-          sonar-scanner @args
 
           if ($LASTEXITCODE -ne 0) {
             throw "SonarQube analysis failed."
           }
-```
