@@ -48,7 +48,6 @@ jobs:
           node --version
           npm --version
 
-      ```yaml
       - name: Build Java microservices
         shell: pwsh
         run: |
@@ -78,7 +77,6 @@ jobs:
             Write-Warning "Some projects failed:"
             $failed | ForEach-Object { Write-Warning $_ }
           }
-```
 
       - name: Install Angular dependencies
         if: hashFiles('Frontend/package-lock.json') != ''
