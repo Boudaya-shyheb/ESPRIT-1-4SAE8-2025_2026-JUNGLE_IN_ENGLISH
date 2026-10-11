@@ -53,6 +53,4 @@ jobs:
           args: >
             -Dsonar.projectKey=jungle-in-english
             -Dsonar.projectName=Jungle-in-English
-            -Dsonar.sources=src
-            -Dsonar.sourceEncoding=UTF-8
-            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/coverage/**,**/*.spec.ts
+        
